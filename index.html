@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Agenda Ministériel — MIFASS</title>
+
+<!-- PWA & iOS Meta -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1d3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Agenda MIFASS">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --navy: #0f1d3a;
+    --navy-2: #1a2a4f;
+    --cream: #faf6ef;
+    --paper: #f4ede1;
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --green: #00853f;
+    --yellow: #fdef42;
+    --red: #e31b23;
+    --line: #2a2a2a14;
+    --shadow: 0 1px 2px rgba(15,29,58,0.04), 0 8px 24px rgba(15,29,58,0.06);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+    --c-audience: #00853f;
+    --c-voyage: #c79100;
+    --c-ceremonie: #d35400;
+    --c-info: #6c757d;
+    --c-pending: #2a6fb0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(15,29,58,0.025) 1px, transparent 1px);
+    background-size: 24px 24px;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 40px 80px;
+  }
+
+  /* ===== HEADER ===== */
+  header.masthead {
+    border-top: 6px solid var(--navy);
+    padding-top: 24px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 20px;
+  }
+
+  .crest {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .crest-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--cream);
+    display: grid;
+    place-items: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .crest-mark::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid var(--navy);
+    opacity: 0.3;
+  }
+
+  .crest-text .ministry {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    margin-bottom: 3px;
+  }
+
+  .crest-text .republic {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .header-meta {
+    text-align: right;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+  .header-meta .date-now {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(38px, 5.5vw, 64px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-top: 28px;
+  }
+
+  .masthead h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--navy);
+  }
+
+  .subtitle {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    max-width: 600px;
+    line-height: 1.5;
+  }
+
+  /* ===== TOOLBAR ===== */
+  .toolbar {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    margin-right: 8px;
+  }
+
+  .chip {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .chip .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .chip:hover { border-color: var(--navy); color: var(--navy); }
+  .chip.active { background: var(--navy); color: white; border-color: var(--navy); }
+  .chip.active .dot { background: white; }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border: 1px solid var(--navy);
+    background: transparent;
+    color: var(--navy);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn:hover { background: var(--navy); color: white; }
+  .btn-primary { background: var(--navy); color: white; }
+  .btn-primary:hover { background: var(--navy-2); border-color: var(--navy-2); }
+
+  .btn svg { width: 14px; height: 14px; }
+
+  /* ===== VIEW TABS ===== */
+  .view-tabs {
+    display: flex;
+    gap: 0;
+    margin: 24px 0 20px;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .view-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 12px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+    white-space: nowrap;
+  }
+  .view-tab:hover { color: var(--navy); }
+  .view-tab.active {
+    color: var(--navy);
+    border-bottom-color: var(--navy);
+  }
+
+  /* ===== STATS ===== */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .stat {
+    background: white;
+    padding: 18px 20px;
+    position: relative;
+  }
+  .stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .stat-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+  }
+
+  /* ===== LIST VIEW ===== */
+  .events-list { display: none; }
+  .events-list.active { display: block; }
+
+  .event-day-group {
+    margin-bottom: 28px;
+  }
+
+  .day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 12px;
+  }
+
+  .day-num {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--navy);
+    line-height: 1;
+  }
+
+  .day-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+  }
+
+  .day-month {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  .event-card {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 24px;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--c-info);
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .event-card:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow);
+  }
+
+  .event-card[data-type="audience"] { border-left-color: var(--c-audience); }
+  .event-card[data-type="voyage"] { border-left-color: var(--c-voyage); }
+  .event-card[data-type="ceremonie"] { border-left-color: var(--c-ceremonie); }
+  .event-card[data-type="info"] { border-left-color: var(--c-info); }
+  .event-card[data-type="pending"] {
+    border-left-color: var(--c-pending);
+    background: linear-gradient(90deg, rgba(42,111,176,0.04) 0%, white 30%);
+  }
+
+  .event-time {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--navy);
+  }
+  .event-time small {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  .event-body .event-title {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .event-body .event-meta {
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .event-body .event-meta span { display: inline-flex; align-items: center; gap: 4px; }
+
+  .event-tag {
+    align-self: flex-start;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 4px 8px;
+    border-radius: 2px;
+    color: white;
+    white-space: nowrap;
+  }
+
+  .event-tag[data-type="audience"] { background: var(--c-audience); }
+  .event-tag[data-type="voyage"] { background: var(--c-voyage); }
+  .event-tag[data-type="ceremonie"] { background: var(--c-ceremonie); }
+  .event-tag[data-type="info"] { background: var(--c-info); }
+  .event-tag[data-type="pending"] { background: var(--c-pending); }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--ink-soft);
+  }
+  .empty-state .big {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  /* ===== CALENDAR VIEW ===== */
+  .calendar-view { display: none; }
+  .calendar-view.active { display: block; }
+
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .cal-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+  }
+  .cal-title em {
+    font-style: italic;
+    color: var(--navy);
+  }
+  .cal-nav { display: flex; gap: 4px; }
+  .cal-nav button {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--navy);
+  }
+  .cal-nav button:hover { background: var(--navy); color: white; border-color: var(--navy); }
+
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: var(--line);
+    border: 1px solid var(--line);
+    gap: 1px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .cal-dayname {
+    background: var(--navy);
+    color: var(--cream);
+    padding: 10px;
+    text-align: center;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 500;
+  }
+  .cal-cell {
+    background: white;
+    min-height: 100px;
+    padding: 8px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .cal-cell:hover { background: var(--paper); }
+  .cal-cell.other-month { background: #fafafa; color: #ccc; }
+  .cal-cell.today { background: #fffbe5; }
+  .cal-cell.today .cal-day-num { color: var(--red); font-weight: 700; }
+  .cal-day-num {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+  }
+  .cal-events {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .cal-event-pill {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .cal-event-pill[data-type="audience"] { background: var(--c-audience); }
+  .cal-event-pill[data-type="voyage"] { background: var(--c-voyage); }
+  .cal-event-pill[data-type="ceremonie"] { background: var(--c-ceremonie); }
+  .cal-event-pill[data-type="info"] { background: var(--c-info); }
+  .cal-event-pill[data-type="pending"] { background: var(--c-pending); }
+
+  /* ===== PASTE VIEW ===== */
+  .paste-view { display: none; }
+  .paste-view.active { display: block; }
+
+  .paste-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .paste-card h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .paste-card p {
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .paste-card .format-help {
+    background: var(--paper);
+    padding: 14px 16px;
+    border-radius: 4px;
+    font-family: 'Fraunces', serif;
+    font-size: 12px;
+    margin-bottom: 16px;
+    border-left: 3px solid var(--navy);
+  }
+  .paste-card .format-help strong {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--navy);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .paste-card .format-help code {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    background: white;
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  textarea.paste-input {
+    width: 100%;
+    min-height: 280px;
+    padding: 14px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    resize: vertical;
+    outline: none;
+    transition: border 0.15s;
+    background: var(--cream);
+  }
+  textarea.paste-input:focus { border-color: var(--navy); }
+
+  /* ===== MODAL ===== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,29,58,0.5);
+    z-index: 99;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+    padding-top: calc(20px + var(--safe-top));
+    padding-bottom: calc(20px + var(--safe-bottom));
+  }
+  .modal-backdrop.active { display: flex; }
+  .modal {
+    background: var(--cream);
+    border-radius: 6px;
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-top: 5px solid var(--navy);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .modal-header {
+    padding: 20px 24px 12px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-header h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .modal-close {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    line-height: 1;
+  }
+  .modal-body { padding: 20px 24px; }
+
+  .field {
+    margin-bottom: 14px;
+  }
+  .field label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    background: white;
+    outline: none;
+    transition: border 0.15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--navy);
+  }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .btn-danger {
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .btn-danger:hover { background: var(--red); color: white; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: calc(24px + var(--safe-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(40px);
+    background: var(--navy);
+    color: var(--cream);
+    padding: 12px 22px;
+    border-radius: 100px;
+    font-size: 13px;
+    box-shadow: 0 12px 30px rgba(15,29,58,0.3);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 200;
+    font-family: 'Fraunces', serif;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ===== INSTALL BANNER (iOS) ===== */
+  .install-banner {
+    position: fixed;
+    bottom: calc(20px + var(--safe-bottom));
+    left: 16px;
+    right: 16px;
+    background: var(--navy);
+    color: var(--cream);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    z-index: 150;
+    font-size: 13px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    line-height: 1.4;
+  }
+  .install-banner.show { display: flex; }
+  .install-banner .icn {
+    width: 36px;
+    height: 36px;
+    background: var(--cream);
+    color: var(--navy);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .install-banner .txt { flex: 1; }
+  .install-banner .txt strong { display: block; margin-bottom: 2px; font-family: 'Fraunces', serif; }
+  .install-banner button {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  /* ===== FOOTER FLAG ===== */
+  .flag-strip {
+    display: flex;
+    height: 4px;
+    margin-top: 40px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .flag-strip div { flex: 1; }
+  .flag-strip .g { background: var(--green); }
+  .flag-strip .y { background: var(--yellow); }
+  .flag-strip .r { background: var(--red); }
+
+  @media (max-width: 768px) {
+    .container { padding: 16px; }
+    .masthead-top { flex-direction: column; gap: 12px; }
+    .header-meta { text-align: left; }
+    .crest-text .republic { font-size: 14px; }
+    .event-card { grid-template-columns: 1fr; gap: 8px; padding: 14px; }
+    .event-time { font-size: 16px; }
+    .toolbar { flex-direction: column; align-items: stretch; padding: 12px; }
+    .filters { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+    .filter-label { display: none; }
+    .actions { justify-content: stretch; }
+    .actions .btn { flex: 1; justify-content: center; }
+    .cal-cell { min-height: 60px; padding: 4px; }
+    .cal-day-num { font-size: 13px; }
+    .cal-event-pill { font-size: 8px; padding: 1px 3px; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stat { padding: 12px 14px; }
+    .stat-value { font-size: 24px; }
+    .field-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="masthead">
+    <div class="masthead-top">
+      <div class="crest">
+        <div class="crest-mark">M</div>
+        <div class="crest-text">
+          <div class="ministry">République du Sénégal · Un Peuple — Un But — Une Foi</div>
+          <div class="republic">Ministère de la Famille, de l'Action Sociale et des Solidarités</div>
+        </div>
+      </div>
+      <div class="header-meta">
+        <div class="date-now" id="todayDate">—</div>
+        <div>Cabinet du Ministre · CELLCOM</div>
+      </div>
+    </div>
+    <h1>Agenda <em>du Ministre</em></h1>
+    <p class="subtitle">Tableau de bord institutionnel pour la planification, le suivi et la consolidation des activités, déplacements, audiences et cérémonies du Cabinet.</p>
+  </header>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="filters">
+      <span class="filter-label">Filtrer</span>
+      <button class="chip active" data-filter="all">Tous</button>
+      <button class="chip" data-filter="audience" style="color:var(--c-audience)"><span class="dot"></span>Audience</button>
+      <button class="chip" data-filter="voyage" style="color:var(--c-voyage)"><span class="dot"></span>Voyage</button>
+      <button class="chip" data-filter="ceremonie" style="color:var(--c-ceremonie)"><span class="dot"></span>Cérémonie</button>
+      <button class="chip" data-filter="info" style="color:var(--c-info)"><span class="dot"></span>Info</button>
+      <button class="chip" data-filter="pending" style="color:var(--c-pending)"><span class="dot"></span>À planifier</button>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="openPaste()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+        Coller
+      </button>
+      <button class="btn" onclick="exportWord()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Word
+      </button>
+      <button class="btn" onclick="exportPDF()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+        PDF
+      </button>
+      <button class="btn btn-primary" onclick="openModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Ajouter
+      </button>
+    </div>
+  </div>
+
+  <!-- VIEW TABS -->
+  <div class="view-tabs">
+    <button class="view-tab active" data-view="list">Liste chronologique</button>
+    <button class="view-tab" data-view="calendar">Vue calendrier</button>
+    <button class="view-tab" data-view="paste">Importer</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats" id="statsContainer"></div>
+
+  <!-- LIST VIEW -->
+  <div class="events-list active" id="listView"></div>
+
+  <!-- CALENDAR VIEW -->
+  <div class="calendar-view" id="calView">
+    <div class="cal-header">
+      <div class="cal-title" id="calTitle">—</div>
+      <div class="cal-nav">
+        <button onclick="changeMonth(-1)" aria-label="Mois précédent">‹</button>
+        <button onclick="goToday()" title="Aujourd'hui">●</button>
+        <button onclick="changeMonth(1)" aria-label="Mois suivant">›</button>
+      </div>
+    </div>
+    <div class="calendar" id="calendarGrid"></div>
+  </div>
+
+  <!-- PASTE VIEW -->
+  <div class="paste-view" id="pasteView">
+    <div class="paste-card">
+      <h2>Importer des données</h2>
+      <p>Collez vos données ci-dessous. Une ligne par événement. Le système détecte automatiquement le format.</p>
+
+      <div class="format-help">
+        <strong>Formats acceptés (séparateur : tabulation, point-virgule ou |)</strong>
+        <code>2026-05-04 | 09:00 | Audience Représentant ONU | Cabinet du Ministre | audience</code><br>
+        <code>2026-05-05;14:30;Mission CSW;New York;voyage</code><br>
+        Colonnes : <em>date | heure | titre | lieu | type | agents (optionnel)</em><br>
+        Types : <code>audience</code>, <code>voyage</code>, <code>ceremonie</code>, <code>info</code>, <code>pending</code>
+      </div>
+
+      <textarea class="paste-input" id="pasteInput" placeholder="Collez ici vos données depuis Excel, Word, ou autre source..."></textarea>
+
+      <div style="margin-top:14px; display:flex; gap:8px; justify-content:space-between; flex-wrap:wrap;">
+        <button class="btn btn-danger" onclick="resetAll()" style="margin-right:auto;">Tout effacer</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn" onclick="document.getElementById('pasteInput').value=''">Vider</button>
+          <button class="btn btn-primary" onclick="importPasted()">Importer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flag-strip">
+    <div class="g"></div><div class="y"></div><div class="r"></div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Nouvel événement</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="evId">
+      <div class="field">
+        <label>Intitulé de l'activité</label>
+        <input type="text" id="evTitle" placeholder="Ex. Audience avec le Représentant Résident du PNUD">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="evDate">
+        </div>
+        <div class="field">
+          <label>Heure</label>
+          <input type="time" id="evTime">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Type</label>
+          <select id="evType">
+            <option value="audience">Audience</option>
+            <option value="voyage">Voyage / Mission</option>
+            <option value="ceremonie">Cérémonie / Atelier</option>
+            <option value="info">Information</option>
+            <option value="pending">À planifier</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Lieu</label>
+          <input type="text" id="evLocation" placeholder="Ex. Cabinet, Dakar">
+        </div>
+      </div>
+      <div class="field">
+        <label>Agents / Personnes concernées</label>
+        <input type="text" id="evAgents" placeholder="Ex. DAGE, CELLCOM">
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea id="evNotes" rows="2" placeholder="Détails complémentaires..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deleteBtn" onclick="deleteEvent()" style="display:none">Supprimer</button>
+      <div style="display:flex; gap:8px; margin-left:auto;">
+        <button class="btn" onclick="closeModal()">Annuler</button>
+        <button class="btn btn-primary" onclick="saveEvent()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INSTALL BANNER (iOS) -->
+<div class="install-banner" id="installBanner">
+  <div class="icn">M</div>
+  <div class="txt">
+    <strong>Installer l'app</strong>
+    Touchez <span style="display:inline-block;border:1px solid rgba(255,255,255,0.4);padding:0 4px;border-radius:3px;">⬆︎</span> puis « Sur l'écran d'accueil »
+  </div>
+  <button onclick="dismissInstall()">✕</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ============= STATE =============
+  let events = [];
+  let activeFilter = 'all';
+  let activeView = 'list';
+  let calCursor = new Date();
+  let editingId = null;
+
+  const STORAGE_KEY = 'mifass_agenda_events_v1';
+  const INSTALL_DISMISSED_KEY = 'mifass_install_dismissed_v1';
+
+  const TYPES = {
+    audience:   { label: 'Audience',     color: 'var(--c-audience)'  },
+    voyage:     { label: 'Voyage',       color: 'var(--c-voyage)'    },
+    ceremonie:  { label: 'Cérémonie',    color: 'var(--c-ceremonie)' },
+    info:       { label: 'Information',  color: 'var(--c-info)'      },
+    pending:    { label: 'À planifier',  color: 'var(--c-pending)'   }
+  };
+
+  const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  const DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const DAYS_FR_SHORT = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+  // ============= STORAGE (persistant via localStorage) =============
+  function saveData() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+    } catch (e) {
+      console.warn('Sauvegarde impossible :', e);
+    }
+  }
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // ============= INIT =============
+  function init() {
+    events = loadData();
+    updateTodayDate();
+    renderAll();
+    bindEvents();
+    checkInstallPrompt();
+
+    // Service worker pour fonctionnement hors-ligne
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  }
+
+  function updateTodayDate() {
+    const d = new Date();
+    document.getElementById('todayDate').textContent =
+      `${DAYS_FR[d.getDay()]} ${d.getDate()} ${MONTHS_FR[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  function bindEvents() {
+    document.querySelectorAll('.chip[data-filter]').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.chip[data-filter]').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        activeFilter = b.dataset.filter;
+        renderAll();
+      });
+    });
+    document.querySelectorAll('.view-tab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.view-tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        activeView = t.dataset.view;
+        switchView();
+      });
+    });
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') closeModal();
+    });
+  }
+
+  // ============= INSTALL BANNER (iOS) =============
+  function checkInstallPrompt() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    const dismissed = localStorage.getItem(INSTALL_DISMISSED_KEY);
+
+    if (isIOS && !isStandalone && !dismissed) {
+      setTimeout(() => {
+        document.getElementById('installBanner').classList.add('show');
+      }, 2000);
+    }
+  }
+
+  function dismissInstall() {
+    document.getElementById('installBanner').classList.remove('show');
+    localStorage.setItem(INSTALL_DISMISSED_KEY, '1');
+  }
+
+  function switchView() {
+    document.getElementById('listView').classList.toggle('active', activeView === 'list');
+    document.getElementById('calView').classList.toggle('active', activeView === 'calendar');
+    document.getElementById('pasteView').classList.toggle('active', activeView === 'paste');
+    if (activeView === 'calendar') renderCalendar();
+  }
+
+  function openPaste() {
+    document.querySelectorAll('.view-tab').forEach(x => x.classList.remove('active'));
+    document.querySelector('.view-tab[data-view="paste"]').classList.add('active');
+    activeView = 'paste';
+    switchView();
+  }
+
+  // ============= RENDER =============
+  function renderAll() {
+    renderStats();
+    renderList();
+    if (activeView === 'calendar') renderCalendar();
+  }
+
+  function filteredEvents() {
+    if (activeFilter === 'all') return events;
+    return events.filter(e => e.type === activeFilter);
+  }
+
+  function renderStats() {
+    const counts = { audience:0, voyage:0, ceremonie:0, info:0, pending:0 };
+    events.forEach(e => { if (counts[e.type] !== undefined) counts[e.type]++; });
+    const total = events.length;
+    const html = `
+      <div class="stat">
+        <div class="stat-label">Total</div>
+        <div class="stat-value">${total.toString().padStart(2,'0')}</div>
+        <div class="stat-bar" style="background:var(--navy)"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Audiences</div>
+        <div class="stat-value">${counts.audience.toString().padStart(2,'0')}</div>
+        <div class="stat-bar" style="background:var(--c-audience)"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Voyages</div>
+        <div class="stat-value">${counts.voyage.toString().padStart(2,'0')}</div>
+        <div class="stat-bar" style="background:var(--c-voyage)"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Cérémonies</div>
+        <div class="stat-value">${counts.ceremonie.toString().padStart(2,'0')}</div>
+        <div class="stat-bar" style="background:var(--c-ceremonie)"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">À planifier</div>
+        <div class="stat-value">${counts.pending.toString().padStart(2,'0')}</div>
+        <div class="stat-bar" style="background:var(--c-pending)"></div>
+      </div>
+    `;
+    document.getElementById('statsContainer').innerHTML = html;
+  }
+
+  function renderList() {
+    const list = document.getElementById('listView');
+    const f = filteredEvents().slice().sort((a,b) => {
+      const da = `${a.date || '9999-12-31'}T${a.time || '00:00'}`;
+      const db = `${b.date || '9999-12-31'}T${b.time || '00:00'}`;
+      return da.localeCompare(db);
+    });
+
+    if (f.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="big">— Aucun événement —</div>
+          <div>Touchez <strong>Ajouter</strong> ou <strong>Coller</strong> pour démarrer.</div>
+        </div>`;
+      return;
+    }
+
+    const groups = {};
+    f.forEach(e => {
+      const k = e.date || 'sans-date';
+      (groups[k] = groups[k] || []).push(e);
+    });
+
+    list.innerHTML = Object.entries(groups).map(([dateKey, evs]) => {
+      let header = '';
+      if (dateKey === 'sans-date') {
+        header = `<div class="day-header">
+          <div class="day-num">—</div>
+          <div><div class="day-name">À planifier</div><div class="day-month">date à confirmer</div></div>
+        </div>`;
+      } else {
+        const d = new Date(dateKey + 'T00:00');
+        header = `<div class="day-header">
+          <div class="day-num">${d.getDate().toString().padStart(2,'0')}</div>
+          <div>
+            <div class="day-name">${DAYS_FR[d.getDay()]}</div>
+            <div class="day-month">${MONTHS_FR[d.getMonth()]} ${d.getFullYear()}</div>
+          </div>
+        </div>`;
+      }
+      const cards = evs.map(e => `
+        <div class="event-card" data-type="${e.type}" onclick="editEvent('${e.id}')">
+          <div class="event-time">
+            ${e.time || '—'}
+            <small>${e.time ? 'Heure' : 'À confirmer'}</small>
+          </div>
+          <div class="event-body">
+            <div class="event-title">${escapeHtml(e.title || 'Sans titre')}</div>
+            <div class="event-meta">
+              ${e.location ? `<span>📍 ${escapeHtml(e.location)}</span>` : ''}
+              ${e.agents ? `<span>👤 ${escapeHtml(e.agents)}</span>` : ''}
+              ${e.notes ? `<span>📝 ${escapeHtml(e.notes.substring(0, 60))}${e.notes.length > 60 ? '…' : ''}</span>` : ''}
+            </div>
+          </div>
+          <div class="event-tag" data-type="${e.type}">${TYPES[e.type]?.label || e.type}</div>
+        </div>
+      `).join('');
+      return `<div class="event-day-group">${header}${cards}</div>`;
+    }).join('');
+  }
+
+  function renderCalendar() {
+    const y = calCursor.getFullYear();
+    const m = calCursor.getMonth();
+    document.getElementById('calTitle').innerHTML = `${MONTHS_FR[m]} <em>${y}</em>`;
+
+    const firstDay = new Date(y, m, 1);
+    const lastDay = new Date(y, m + 1, 0);
+    let startDay = firstDay.getDay() - 1;
+    if (startDay < 0) startDay = 6;
+
+    const grid = document.getElementById('calendarGrid');
+    let html = DAYS_FR_SHORT.map(d => `<div class="cal-dayname">${d}</div>`).join('');
+
+    for (let i = 0; i < startDay; i++) {
+      const dPrev = new Date(y, m, -startDay + i + 1);
+      html += `<div class="cal-cell other-month"><div class="cal-day-num">${dPrev.getDate()}</div></div>`;
+    }
+
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
+
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      const dateStr = `${y}-${(m+1).toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}`;
+      const isToday = dateStr === todayStr;
+      const dayEvents = filteredEvents().filter(e => e.date === dateStr);
+      const pills = dayEvents.slice(0, 3).map(e =>
+        `<div class="cal-event-pill" data-type="${e.type}" onclick="event.stopPropagation();editEvent('${e.id}')" title="${escapeAttr(e.title)}">${escapeHtml((e.time ? e.time + ' ' : '') + e.title)}</div>`
+      ).join('');
+      const more = dayEvents.length > 3 ? `<div class="cal-event-pill" style="background:var(--ink-soft)">+${dayEvents.length - 3} autres</div>` : '';
+      html += `<div class="cal-cell ${isToday ? 'today' : ''}" onclick="newEventOnDate('${dateStr}')">
+        <div class="cal-day-num">${day}</div>
+        <div class="cal-events">${pills}${more}</div>
+      </div>`;
+    }
+
+    const totalCells = startDay + lastDay.getDate();
+    const trail = (7 - (totalCells % 7)) % 7;
+    for (let i = 1; i <= trail; i++) {
+      html += `<div class="cal-cell other-month"><div class="cal-day-num">${i}</div></div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function changeMonth(delta) {
+    calCursor.setMonth(calCursor.getMonth() + delta);
+    renderCalendar();
+  }
+  function goToday() {
+    calCursor = new Date();
+    renderCalendar();
+  }
+  function newEventOnDate(dateStr) {
+    openModal();
+    document.getElementById('evDate').value = dateStr;
+  }
+
+  // ============= MODAL =============
+  function openModal() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Nouvel événement';
+    document.getElementById('evId').value = '';
+    document.getElementById('evTitle').value = '';
+    document.getElementById('evDate').value = '';
+    document.getElementById('evTime').value = '';
+    document.getElementById('evType').value = 'audience';
+    document.getElementById('evLocation').value = '';
+    document.getElementById('evAgents').value = '';
+    document.getElementById('evNotes').value = '';
+    document.getElementById('deleteBtn').style.display = 'none';
+    document.getElementById('modal').classList.add('active');
+  }
+
+  function editEvent(id) {
+    const e = events.find(x => x.id === id);
+    if (!e) return;
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'Modifier l\'événement';
+    document.getElementById('evId').value = id;
+    document.getElementById('evTitle').value = e.title || '';
+    document.getElementById('evDate').value = e.date || '';
+    document.getElementById('evTime').value = e.time || '';
+    document.getElementById('evType').value = e.type || 'audience';
+    document.getElementById('evLocation').value = e.location || '';
+    document.getElementById('evAgents').value = e.agents || '';
+    document.getElementById('evNotes').value = e.notes || '';
+    document.getElementById('deleteBtn').style.display = 'inline-flex';
+    document.getElementById('modal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+    editingId = null;
+  }
+
+  function saveEvent() {
+    const title = document.getElementById('evTitle').value.trim();
+    if (!title) { showToast('Veuillez saisir un intitulé'); return; }
+    const obj = {
+      id: editingId || ('ev_' + Date.now() + '_' + Math.random().toString(36).slice(2,7)),
+      title,
+      date: document.getElementById('evDate').value,
+      time: document.getElementById('evTime').value,
+      type: document.getElementById('evType').value,
+      location: document.getElementById('evLocation').value.trim(),
+      agents: document.getElementById('evAgents').value.trim(),
+      notes: document.getElementById('evNotes').value.trim()
+    };
+    if (editingId) {
+      const idx = events.findIndex(e => e.id === editingId);
+      if (idx >= 0) events[idx] = obj;
+      showToast('Événement modifié');
+    } else {
+      events.push(obj);
+      showToast('Événement ajouté');
+    }
+    saveData();
+    closeModal();
+    renderAll();
+  }
+
+  function deleteEvent() {
+    if (!editingId) return;
+    if (!confirm('Supprimer cet événement ?')) return;
+    events = events.filter(e => e.id !== editingId);
+    saveData();
+    closeModal();
+    renderAll();
+    showToast('Événement supprimé');
+  }
+
+  function resetAll() {
+    if (!confirm('Effacer TOUS les événements ? Cette action est irréversible.')) return;
+    events = [];
+    saveData();
+    renderAll();
+    showToast('Agenda réinitialisé');
+  }
+
+  // ============= IMPORT =============
+  function importPasted() {
+    const txt = document.getElementById('pasteInput').value.trim();
+    if (!txt) { showToast('Veuillez coller des données'); return; }
+    const lines = txt.split(/\r?\n/).filter(l => l.trim());
+    let added = 0;
+    lines.forEach(line => {
+      const sep = line.includes('\t') ? '\t' : line.includes('|') ? '|' : line.includes(';') ? ';' : ',';
+      const parts = line.split(sep).map(p => p.trim());
+      if (parts.length < 2) return;
+      const [date, time, title, location, type, agents] = parts;
+      events.push({
+        id: 'ev_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+        title: title || date || 'Événement',
+        date: parseDate(date),
+        time: parseTime(time),
+        type: normalizeType(type),
+        location: location || '',
+        agents: agents || '',
+        notes: ''
+      });
+      added++;
+    });
+    saveData();
+    document.getElementById('pasteInput').value = '';
+    document.querySelectorAll('.view-tab').forEach(x => x.classList.remove('active'));
+    document.querySelector('.view-tab[data-view="list"]').classList.add('active');
+    activeView = 'list';
+    switchView();
+    renderAll();
+    showToast(`${added} événement${added>1?'s':''} importé${added>1?'s':''}`);
+  }
+
+  function parseDate(s) {
+    if (!s) return '';
+    s = s.trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0, 10);
+    const m1 = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if (m1) return `${m1[3]}-${m1[2].padStart(2,'0')}-${m1[1].padStart(2,'0')}`;
+    return '';
+  }
+  function parseTime(s) {
+    if (!s) return '';
+    const m = s.match(/(\d{1,2})[:hH](\d{0,2})/);
+    if (m) return `${m[1].padStart(2,'0')}:${(m[2] || '00').padStart(2,'0')}`;
+    return '';
+  }
+  function normalizeType(t) {
+    if (!t) return 'info';
+    t = t.toLowerCase().trim();
+    if (t.includes('audien')) return 'audience';
+    if (t.includes('voyage') || t.includes('mission') || t.includes('depla')) return 'voyage';
+    if (t.includes('ceremon') || t.includes('atelier') || t.includes('lance')) return 'ceremonie';
+    if (t.includes('plan') || t.includes('attente') || t.includes('pending')) return 'pending';
+    if (t.includes('info')) return 'info';
+    if (Object.keys(TYPES).includes(t)) return t;
+    return 'info';
+  }
+
+  // ============= EXPORT WORD =============
+  function exportWord() {
+    if (events.length === 0) { showToast('Aucun événement à exporter'); return; }
+    const sorted = events.slice().sort((a,b) => {
+      const da = `${a.date || '9999-12-31'}T${a.time || '00:00'}`;
+      const db = `${b.date || '9999-12-31'}T${b.time || '00:00'}`;
+      return da.localeCompare(db);
+    });
+
+    const today = new Date();
+    const dateStr = `${today.getDate()} ${MONTHS_FR[today.getMonth()]} ${today.getFullYear()}`;
+    const planned = sorted.filter(e => e.type !== 'pending');
+    const pending = sorted.filter(e => e.type === 'pending');
+    const colorMap = { audience:'C8E6C9', voyage:'FFF3CD', ceremonie:'FFE5D0', info:'E0E0E0', pending:'CFE2F3' };
+
+    const rowsPlanned = planned.map(e => {
+      const d = e.date ? new Date(e.date + 'T00:00') : null;
+      const dateText = d ? `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}` : '—';
+      const dayText = d ? DAYS_FR[d.getDay()] : '—';
+      const bg = colorMap[e.type] || 'FFFFFF';
+      return `
+        <tr>
+          <td style="background:#${bg};">${escapeHtml(dateText)}</td>
+          <td style="background:#${bg};">${escapeHtml(dayText)}</td>
+          <td style="background:#${bg};">${escapeHtml(e.title || '')}</td>
+          <td style="background:#${bg};">${escapeHtml(e.location || '')}</td>
+          <td style="background:#${bg};">${escapeHtml((TYPES[e.type]||{}).label || e.type)}</td>
+          <td style="background:#${bg};">${escapeHtml(e.time || '')}</td>
+          <td style="background:#${bg};">${escapeHtml(e.agents || '')}</td>
+        </tr>`;
+    }).join('');
+
+    const rowsPending = pending.map((e, i) => `
+      <tr>
+        <td style="background:#CFE2F3;">${i+1}</td>
+        <td style="background:#CFE2F3;">${escapeHtml(e.title || '')}</td>
+        <td style="background:#CFE2F3;">${escapeHtml(e.notes || e.location || '')}</td>
+        <td style="background:#CFE2F3;">${escapeHtml(e.location || '')}</td>
+        <td style="background:#CFE2F3;">${escapeHtml(e.agents || '')}</td>
+      </tr>`).join('');
+
+    const html = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"><title>Agenda Ministre MIFASS</title>
+      <xml><w:WordDocument><w:View>Print</w:View><w:Zoom>90</w:Zoom></w:WordDocument></xml>
+      <style>
+        @page { size: A4 landscape; margin: 1.5cm; }
+        body { font-family: Calibri, sans-serif; font-size: 11pt; }
+        h1 { font-size: 18pt; color: #0f1d3a; text-align: center; margin: 0 0 6pt; }
+        h2 { font-size: 11pt; color: #0f1d3a; text-align: center; font-weight: normal; margin: 0 0 18pt; }
+        h3 { font-size: 13pt; color: #0f1d3a; margin: 12pt 0 6pt; border-bottom: 2px solid #0f1d3a; padding-bottom: 4pt; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #0f1d3a; color: white; padding: 6pt; font-size: 10pt; text-align: left; }
+        td { padding: 5pt; border: 0.5pt solid #999; font-size: 10pt; vertical-align: top; }
+      </style></head>
+      <body>
+        <h1>AGENDA DU MINISTRE</h1>
+        <h2>Ministère de la Famille, de l'Action Sociale et des Solidarités — Cabinet · ${dateStr}</h2>
+        <h3>I. Activités planifiées</h3>
+        <table>
+          <thead><tr><th>DATE</th><th>JOUR</th><th>ACTIVITÉ / ÉVÉNEMENT</th><th>LIEU</th><th>TYPE</th><th>HEURE</th><th>AGENTS</th></tr></thead>
+          <tbody>${rowsPlanned || '<tr><td colspan="7" style="text-align:center; font-style:italic;">Aucune activité planifiée</td></tr>'}</tbody>
+        </table>
+        ${pending.length ? `
+        <h3>II. Audiences / Activités à planifier</h3>
+        <table>
+          <thead><tr><th>N°</th><th>NOM / STRUCTURE</th><th>OBJET</th><th>CONTACT</th><th>AGENTS</th></tr></thead>
+          <tbody>${rowsPending}</tbody>
+        </table>` : ''}
+      </body></html>`;
+
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Agenda_Ministre_MIFASS_${today.toISOString().slice(0,10)}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Export Word généré');
+  }
+
+  // ============= EXPORT PDF =============
+  function exportPDF() {
+    if (events.length === 0) { showToast('Aucun événement à exporter'); return; }
+    const sorted = events.slice().sort((a,b) => {
+      const da = `${a.date || '9999-12-31'}T${a.time || '00:00'}`;
+      const db = `${b.date || '9999-12-31'}T${b.time || '00:00'}`;
+      return da.localeCompare(db);
+    });
+
+    const today = new Date();
+    const dateStr = `${today.getDate()} ${MONTHS_FR[today.getMonth()]} ${today.getFullYear()}`;
+    const colorMap = { audience:'#C8E6C9', voyage:'#FFF3CD', ceremonie:'#FFE5D0', info:'#E0E0E0', pending:'#CFE2F3' };
+
+    const rows = sorted.map(e => {
+      const d = e.date ? new Date(e.date + 'T00:00') : null;
+      const dateText = d ? `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}` : '—';
+      return `<tr style="background:${colorMap[e.type] || '#fff'}">
+        <td>${escapeHtml(dateText)}</td>
+        <td>${escapeHtml(e.time || '—')}</td>
+        <td><strong>${escapeHtml(e.title || '')}</strong></td>
+        <td>${escapeHtml(e.location || '')}</td>
+        <td>${escapeHtml((TYPES[e.type]||{}).label || e.type)}</td>
+      </tr>`;
+    }).join('');
+
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Agenda Ministre</title>
+      <style>
+        @page { size: A4 landscape; margin: 1cm; }
+        body { font-family: Georgia, serif; padding: 20px; }
+        h1 { color: #0f1d3a; border-bottom: 3px solid #0f1d3a; padding-bottom: 6px; font-weight: 400; }
+        .sub { color: #666; font-size: 12px; margin-bottom: 18px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { background: #0f1d3a; color: white; padding: 8px; text-align: left; }
+        td { padding: 6px 8px; border: 1px solid #ccc; }
+        .flag { display:flex; height:5px; margin-top:30px; }
+        .flag div { flex:1; }
+        @media print { body { padding: 0; } }
+      </style></head>
+      <body>
+        <h1>Agenda du Ministre</h1>
+        <div class="sub">MIFASS · ${dateStr} · ${sorted.length} événement${sorted.length>1?'s':''}</div>
+        <table><thead><tr><th>Date</th><th>Heure</th><th>Activité</th><th>Lieu</th><th>Type</th></tr></thead>
+        <tbody>${rows}</tbody></table>
+        <div class="flag"><div style="background:#00853f"></div><div style="background:#fdef42"></div><div style="background:#e31b23"></div></div>
+        <script>window.onload = () => window.print();<\/script>
+      </body></html>`);
+    w.document.close();
+    showToast('Aperçu PDF ouvert');
+  }
+
+  // ============= UTILS =============
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;'); }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  init();
+</script>
+
+</body>
+</html>
